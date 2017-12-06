@@ -1,3 +1,5 @@
+#Projet Gary Djender Nader Khedr
+
 from upemtk import *
 from time import sleep
 from random import *
@@ -117,10 +119,13 @@ def ft_solo_mode():
         pos_S.pop()
         collision = pos_S.count(pos_S[0])
         if collision != 1:
+            score = len(pos_S) - 3
+            print(score,"pommes mangées")
             break
         x, y = pos_S[0]
-        print(pos_S)
-        if x > largeur_plateau or x < 0 or y > hauteur_plateau or y < 0:
+        if x > (largeur_plateau - 1) or x < 0 or y > (hauteur_plateau - 1) or y < 0:
+            score = len(pos_S) - 3
+            print(score,"pommes mangées")
             break
         affiche_serpent(pos_S,3)  # à modifier !
         mise_a_jour()
@@ -132,7 +137,6 @@ def ft_solo_mode():
         if ty == 'Escape':
             break
         elif ty == 'Touche':
-            print(touche(ev))
             direction = change_direction(direction, touche(ev), 1)
 
         # attente avant rafraîchissement
@@ -149,7 +153,6 @@ def ft_duo_mode():
     cree_fenetre(taille_case * largeur_plateau,
                  taille_case * hauteur_plateau)
     # boucle principale
-    pas_pomme = True
     pos_S = [(1,1)]
     pos_S2 = [(38,28)]
     while True:
@@ -182,7 +185,6 @@ def ft_duo_mode():
         if ty == 'Escape':
             break
         elif ty == 'Touche':
-            print(touche(ev))
             direction = change_direction(direction, touche(ev), 1)
             direction2 = change_direction(direction2, touche(ev), 2)
         # attente avant rafraîchissement
