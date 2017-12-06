@@ -37,53 +37,72 @@ def affiche_pommes(pommes):
            couleur='darkred', remplissage='red')
 
 
-def affiche_serpent(serpent):
+def affiche_serpent(serpent, joueur):
     n = 0
     while n < len(serpent):
         x, y = case_vers_pixel(serpent[n])
-
-        cercle(x, y, taille_case/2 + 1,
-               couleur='Black', remplissage='Black')
+        if joueur == 1:
+            cercle(x, y, taille_case/2 + 1,
+                   couleur='Blue', remplissage='Blue')
+        if joueur == 2:
+            cercle(x, y, taille_case/2 + 1,
+                   couleur='Red', remplissage='Red')
+        if joueur == 3:
+            cercle(x, y, taille_case/2 + 1,
+                   couleur='Black', remplissage='Black')
         n += 1
-def change_direction(direction, touche,):
+def change_direction(direction, touche, joueur):
     """Permet de gérer le changement de direction"""
-    if touche == 'Up':
-        # flèche haut pressée
-        return(0, -1)
-    elif touche == 'Down':
-        # flèche bas pressée
-        return(0, 1)
-    elif touche == 'Left':
-        # flèche gauche pressée
-        return(-1 , 0)
-    elif touche == 'Right':
-        # flèche droite pressée
-        return(1, 0)
-    else:
-        # pas de changement !
-        return direction
+    if joueur == 1:
+        if touche == 'Up':
+            # flèche haut pressée
+            return(0, -1)
+        elif touche == 'Down':
+            # flèche bas pressée
+            return(0, 1)
+        elif touche == 'Left':
+            # flèche gauche pressée
+            return(-1 , 0)
+        elif touche == 'Right':
+            # flèche droite pressée
+            return(1, 0)
+        else:
+            # pas de changement !
+            return direction
+    elif joueur == 2:
+        if touche == 'z':
+            # flèche haut pressée
+            return(0, -1)
+        elif touche == 's':
+            # flèche bas pressée
+            return(0, 1)
+        elif touche == 'q':
+            # flèche gauche pressée
+            return(-1 , 0)
+        elif touche == 'd':
+            # flèche droite pressée
+            return(1, 0)
+        else:
+            # pas de changement !
+            return direction
 
 def ft_solo_mode():
     # initialisation du jeu
-    i = 0
     framerate = 10    # taux de rafraîchissement du jeu en images/s
-    direction = (0, 0)  # direction initiale du serpent
-    posS = (0,0)
+    direction = (0, 1)  # direction initiale du serpent
     posP = (40, 30)
     cree_fenetre(taille_case * largeur_plateau,
                  taille_case * hauteur_plateau)
     # boucle principale
     pas_pomme = True
-    pos_S = [(21,15)]
+    pos_S = [(21,15),(21,14),(21,13)]
     while True:
         # affichage des objets
         efface_tout()
         if pos_S[0] == posP:
             pas_pomme = True
             pos_S.append(deplacement(posP, direction, 0))
-        collision = pos_S.count(pos_S[0])
-        if collision != 1:
-            break
+
         if pas_pomme == True:
             px = randint(1, 38)
             py = randint(1, 28)
@@ -94,16 +113,16 @@ def ft_solo_mode():
                 py = randint(1, 29)
                 posP = px, py
         affiche_pommes(posP)# à modifier !
-        if len(pos_S) > 1:
-            pos_S.insert(0, (deplacement(pos_S[0], direction, 1)))
-            pos_S.pop()
-        else:
-            pos_S[0] = (deplacement(pos_S[0], direction, 1))
+        pos_S.insert(0, (deplacement(pos_S[0], direction, 1)))
+        pos_S.pop()
+        collision = pos_S.count(pos_S[0])
+        if collision != 1:
+            break
         x, y = pos_S[0]
         print(pos_S)
         if x > largeur_plateau or x < 0 or y > hauteur_plateau or y < 0:
             break
-        affiche_serpent(pos_S)  # à modifier !
+        affiche_serpent(pos_S,3)  # à modifier !
         mise_a_jour()
 
 
@@ -114,7 +133,7 @@ def ft_solo_mode():
             break
         elif ty == 'Touche':
             print(touche(ev))
-            direction = change_direction(direction, touche(ev))
+            direction = change_direction(direction, touche(ev), 1)
 
         # attente avant rafraîchissement
         sleep(1/framerate)
@@ -122,9 +141,67 @@ def ft_solo_mode():
     # fermeture et sortie
     ferme_fenetre()
 
+def ft_duo_mode():
+    # initialisation du jeu
+    framerate = 10    # taux de rafraîchissement du jeu en images/s
+    direction = (1, 0)  # direction initiale du serpent
+    direction2 = (-1, 0)  # direction initiale du deuxiemme serpent
+    cree_fenetre(taille_case * largeur_plateau,
+                 taille_case * hauteur_plateau)
+    # boucle principale
+    pas_pomme = True
+    pos_S = [(1,1)]
+    pos_S2 = [(38,28)]
+    while True:
+        # affichage des objets
+        efface_tout()
+        pos_S.insert(0, (deplacement(pos_S[0], direction, 1)))
+        x, y = pos_S[0]
+        pos_S2.insert(0, (deplacement(pos_S2[0], direction2, 1)))
+        s, d = pos_S2[0]
+        if x > largeur_plateau or x < 0 or y > hauteur_plateau or y < 0:
+            break
+        if s < 0 or s > largeur_plateau or y < 0 or y > hauteur_plateau:
+            break
+        collision1 = pos_S.count(pos_S2[0]) + pos_S2.count(pos_S2[0])
+        if collision1 != 1:
+            print("J2 désynchronisé")
+            break
+        collision2 = pos_S2.count(pos_S[0]) + pos_S.count(pos_S[0])
+        if collision2 != 1:
+            print("J1 désynchronisé")
+            break
+        affiche_serpent(pos_S,1)  # à modifier !
+        affiche_serpent(pos_S2,2)
+        mise_a_jour()
 
-# programme principal
+
+        # gestion des événements
+        ev = donne_evenement()
+        ty = type_evenement(ev)
+        if ty == 'Escape':
+            break
+        elif ty == 'Touche':
+            print(touche(ev))
+            direction = change_direction(direction, touche(ev), 1)
+            direction2 = change_direction(direction2, touche(ev), 2)
+        # attente avant rafraîchissement
+        sleep(1/framerate)
+
+    # fermeture et sortie
+    ferme_fenetre()
+
+
+
+ #programme principal
 if __name__ == "__main__":
-    ft_solo_mode()
+    mode = "ok"
+    while mode != "SOLO" and mode != "DUO":
+        mode = input("Solo ou duo?:")
+        mode = mode.upper()
+    if mode == "SOLO":
+        ft_solo_mode()
+    else:
+        ft_duo_mode()
 
 
