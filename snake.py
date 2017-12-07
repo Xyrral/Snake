@@ -21,6 +21,7 @@ def deplacement(pos, direction, signe):
     else:
         nPos = (x - s, y - d)
     return nPos
+
 def case_vers_pixel(x):
     """
     Fonction recevant les coordonnées d'une case du plateau sous la forme
@@ -33,10 +34,13 @@ def case_vers_pixel(x):
 
 
 def affiche_pommes(pommes):
-    x, y = case_vers_pixel(pommes)
+    n = 0
+    while n  < len(pommes):
+        x, y = case_vers_pixel(pommes[n])
 
-    cercle(x, y, taille_case/2,
-           couleur='darkred', remplissage='red')
+        cercle(x, y, taille_case/2,
+               couleur='darkred', remplissage='red')
+        n += 1
 
 
 def affiche_serpent(serpent, joueur):
@@ -92,31 +96,41 @@ def ft_solo_mode():
     # initialisation du jeu
     framerate = 10    # taux de rafraîchissement du jeu en images/s
     direction = (0, 1)  # direction initiale du serpent
-    posP = (40, 30)
+    posP = (-1, -1)
+    pos_P = [(40, 30)]
     cree_fenetre(taille_case * largeur_plateau,
                  taille_case * hauteur_plateau)
     # boucle principale
-    pas_pomme = True
+    compteurPomme = 0
+    tempsAvantPomme = 0
     pos_S = [(21,15),(21,14),(21,13)]
     while True:
         # affichage des objets
         efface_tout()
-        if pos_S[0] == posP:
-            pas_pomme = True
-            pos_S.append(deplacement(posP, direction, 0))
+        if pos_P.count(pos_S[0]) != 0:
+            pos_S.append(deplacement(pos_S[0], direction, 0))
+            while pos_P[compteurPomme] != pos_S[0]:
+                compteurPomme += 1
+            pos_P.pop(compteurPomme)
+            compteurPomme = 0
 
-        if pas_pomme == True:
+        if tempsAvantPomme < 0 and len(pos_P) < 6:
+            tempsAvantPomme = 10
             px = randint(1, 38)
             py = randint(1, 28)
-            pas_pomme = False
             posP = px, py
+            pos_P.append(posP)
             while pos_S.count(posP) != 0:
+                pos_P.pop()
                 px = randint(1, 39)
                 py = randint(1, 29)
                 posP = px, py
-        affiche_pommes(posP)# à modifier !
+                pos_P.append(posP)
+
+        affiche_pommes(pos_P)
         pos_S.insert(0, (deplacement(pos_S[0], direction, 1)))
         pos_S.pop()
+
         collision = pos_S.count(pos_S[0])
         if collision != 1:
             score = len(pos_S) - 3
@@ -128,6 +142,7 @@ def ft_solo_mode():
             print(score,"pommes mangées")
             break
         affiche_serpent(pos_S,3)  # à modifier !
+        tempsAvantPomme -= 1
         mise_a_jour()
 
 
